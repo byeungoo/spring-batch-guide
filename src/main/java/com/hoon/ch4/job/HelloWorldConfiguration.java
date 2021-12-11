@@ -1,7 +1,6 @@
-package com.hoon.ch4;
+package com.hoon.ch4.job;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersValidator;
 import org.springframework.batch.core.Step;
@@ -9,6 +8,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.DefaultJobParametersValidator;
+import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Slf4j
 @RequiredArgsConstructor
 public class HelloWorldConfiguration {
 
@@ -29,6 +28,10 @@ public class HelloWorldConfiguration {
         return jobBuilderFactory.get("helloJob8")
                 .validator(validator())
                 .start(step1())
+                //.incrementer(new RunIdIncrementer())    // batch_job_execution_params 테이블에 long 타입을 갖는 run.id 파라미터 생성. 여러번 실행 가능하게해줌
+                .incrementer(new DailyJobTimestamper())   // increment 직접 구현 가능
+                //.listener(new JobLoggerListener())        // 잡 실행 전 후로 특정 로직 실행 가능. 배치의 실행에 영향을 미치면 안된다.
+                .listener(JobListenerFactoryBean.getListener(new JobLoggerListenerAnnotation()))    // 애노테이션 기반으로 리스너 등록
                 .build();
     }
 
