@@ -13,6 +13,16 @@ public class Customer {
 
     public Customer() {}
 
+    public Customer(Customer customer) {
+        Customer newCustomer = new Customer();
+        newCustomer.setZipCode(customer.getZipCode());
+        newCustomer.setMiddleInitial(customer.getMiddleInitial());
+        newCustomer.setLastName(customer.getLastName());
+        newCustomer.setFirstName(customer.getFirstName());
+        newCustomer.setId(customer.getId());
+        newCustomer.setState(customer.getState());
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
